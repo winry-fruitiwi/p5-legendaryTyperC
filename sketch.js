@@ -7,6 +7,7 @@
 let font
 let instructions
 let debugCorner /* output debug text in the bottom left corner of the canvas */
+let championData // data from the riot API
 
 
 function preload() {
@@ -26,8 +27,21 @@ function setup() {
         numpad 1 → freeze sketch</pre>`)
 
     debugCorner = new CanvasDebugCorner(5)
+
+    // ask the Riot API for data on champions with a callback
+    loadJSON("https://ddragon.leagueoflegends.com/cdn/12.12.1/data/en_US/champion.json", gotData)
 }
 
+function gotData(data) {
+    print(data)
+
+    championData = data
+
+    // loop through the data segment of championData, and print champion names
+    for (let champion in championData["data"]) {
+        console.log(champion)
+    }
+}
 
 function draw() {
     background(234, 34, 24)
