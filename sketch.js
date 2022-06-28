@@ -8,6 +8,8 @@ let font
 let instructions
 let debugCorner /* output debug text in the bottom left corner of the canvas */
 let championData // data from the riot API
+let baseChampionString = "https://ddragon.leagueoflegends.com/cdn/12.12.1/data/en_US/champion/"
+let champion = "Ahri" // the champion we want to search for in the riot API
 
 
 function preload() {
@@ -33,14 +35,27 @@ function setup() {
 }
 
 function gotData(data) {
-    print(data)
-
     championData = data
+    let selectedChampionData = championData["data"][champion]
 
-    // loop through the data segment of championData, and print champion names
-    for (let champion in championData["data"]) {
-        console.log(champion)
-    }
+    print(selectedChampionData)
+
+    let selectedChampionName = selectedChampionData["name"]
+
+    print(selectedChampionName)
+
+    // query JSON using basic character
+    loadJSON(baseChampionString + selectedChampionName + ".json", gotChampionData)
+
+    // currently commented out for testing above
+    // // loop through the data segment of championData, and print champion names
+    // for (let champion in championData["data"]) {
+    //     console.log(champion)
+    // }
+}
+
+function gotChampionData(data) {
+    print(data["data"][champion]["title"])
 }
 
 function draw() {
