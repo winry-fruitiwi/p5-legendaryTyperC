@@ -1,6 +1,6 @@
 /**
- *  @author 
- *  @date 2022.05.
+ *  @author
+ *  @date 2022.06.27
  *
  */
 
@@ -9,8 +9,10 @@ let instructions
 let debugCorner /* output debug text in the bottom left corner of the canvas */
 let championData // data from the riot API
 let baseChampionString = "https://ddragon.leagueoflegends.com/cdn/12.12.1/data/en_US/champion/"
-let champion = "Ahri" // the champion we want to search for in the riot API
-
+let champion = "Aatrox" // the champion we want to search for in the riot API
+let passage
+const CARD_IMG_WIDTH = 340
+const CARD_HORIZONTAL_MARGIN = 50
 
 function preload() {
     font = loadFont('data/consola.ttf')
@@ -18,7 +20,7 @@ function preload() {
 
 
 function setup() {
-    let cnv = createCanvas(600, 300)
+    let cnv = createCanvas(1280, 640)
     cnv.parent('#canvas')
     colorMode(HSB, 360, 100, 100, 100)
     textFont(font, 14)
@@ -32,6 +34,9 @@ function setup() {
 
     // ask the Riot API for data on champions with a callback
     loadJSON("https://ddragon.leagueoflegends.com/cdn/12.12.1/data/en_US/champion.json", gotData)
+
+    // initialize the passage with a name
+    passage = new Passage("ABCDEFGHIJKLMNOPQRSTUVQXYZ")
 }
 
 function gotData(data) {
@@ -55,28 +60,120 @@ function gotData(data) {
 }
 
 function gotChampionData(data) {
-    print(data["data"][champion]["title"])
+    // the data from the current champion
+    let currentChampionData = data["data"][champion]
+
+    print(currentChampionData)
+
+    // use a "dictionary" (or object) to keep track of current champion's
+    // abilities. Objects serve a similar purpose in Javascript as
+    // dictionaries in Python, which I am far more familiar with.
+    let currentChampionSpellbook = {}
+
+    for (let ability of currentChampionData["spells"]) {
+        currentChampionSpellbook[ability["id"]] = ability["name"]
+    }
+    console.log(currentChampionSpellbook)
 }
 
 function draw() {
     background(234, 34, 24)
 
+    // if (frameCount > 3000)
+    //     noLoop()
+
+    rectMode(CORNER)
+    passage.render()
+
+    showDebugCorner()
+}
+
+
+// an extra function to reduce confusion and clutter
+function showDebugCorner() {
     /* debugCorner needs to be last so its z-index is highest */
     debugCorner.setText(`frameCount: ${frameCount}`, 2)
     debugCorner.setText(`fps: ${frameRate().toFixed(0)}`, 1)
     debugCorner.show()
-
-    if (frameCount > 3000)
-        noLoop()
 }
 
 
 function keyPressed() {
     /* stop sketch */
-    if (keyCode === 97) { /* numpad 1 */
+    if (keyCode === ESCAPE) {
         noLoop()
         instructions.html(`<pre>
             sketch stopped</pre>`)
+        return
+    }
+
+    // if (keyCode === 100 || keyCode === LEFT_ARROW) { /* numpad 4/left arrow */
+    //     currentCardIndex--
+    //     currentCardIndex = constrain(
+    //         currentCardIndex, 0, scryfall["data"].length - 1
+    //     )
+    //
+    //     updateCard()
+    //     return
+    // }
+    //
+    // if (keyCode === 101 || keyCode === 93) { /* numpad 5 or context menu */
+    //     currentCardIndex = int(random(0, scryfall["data"].length - 1))
+    //
+    //     updateCard()
+    //     return
+    // }
+    //
+    // if (keyCode === 104 || keyCode === UP_ARROW) { /* numpad 8/up arrow */
+    //     currentCardIndex += 10
+    //     currentCardIndex = constrain(
+    //         currentCardIndex, 0, scryfall["data"].length - 1
+    //     )
+    //
+    //     updateCard()
+    //     return
+    // }
+    //
+    // if (keyCode === 98 || keyCode === DOWN_ARROW) { /* numpad 2/down arrow */
+    //     currentCardIndex -= 10
+    //     currentCardIndex = constrain(
+    //         currentCardIndex, 0, scryfall["data"].length - 1
+    //     )
+    //
+    //     updateCard()
+    //     return
+    // }
+    //
+    // if (keyCode === 102 || keyCode === RIGHT_ARROW) { /* numpad 6 */
+    //     currentCardIndex++
+    //     currentCardIndex = constrain(
+    //         currentCardIndex, 0, scryfall["data"].length - 1
+    //     )
+    //
+    //     updateCard()
+    //     return
+    // }
+
+    if (keyCode === SHIFT ||
+        keyCode === ALT ||
+        keyCode === CONTROL ||
+        keyCode === TAB ||
+        keyCode === ESCAPE
+    ) {
+        return
+    }
+
+    else if (keyCode === ENTER) {
+        key = "\n"
+    }
+
+    if (key === passage.getCurrentChar()) {
+        // correct.play()
+        passage.setCorrect()
+    }
+    else {
+        // incorrect.play()
+        passage.setIncorrect()
     }
 }
 
