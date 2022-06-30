@@ -25,7 +25,7 @@ class Passage {
 
         // the margin from the right edge of the bounding box to the right
         // canvas edge
-        // this.RIGHT_MARGIN = CARD_IMG_WIDTH + 2 * CARD_HORIZONTAL_MARGIN
+        this.RIGHT_MARGIN = CARD_IMG_WIDTH + 2 * CARD_HORIZONTAL_MARGIN
 
         // padding for the highlight box of each character
         this.highlightBoxPadding = 3
@@ -53,7 +53,7 @@ class Passage {
         this.LETTER_SPACING = 2
 
         // the horizontal padding for the bounding box
-        // this.BOUNDING_BOX_PADDINGH = 20
+        this.BOUNDING_BOX_PADDINGH = 20
     }
 
 
@@ -70,7 +70,7 @@ class Passage {
         let cursor = this.TEXT_START.copy()
 
         // the height of the viewport, measured in lines
-        let viewportHeight = 3
+        let viewportHeight = 6
 
         // number of lines we've typed
         let linesTyped
@@ -213,30 +213,30 @@ class Passage {
 
         beginContour()
 
-        // // the inner shape is the bounding box, with all of the coordinates
-        // // from my old quadrilateral. I should have used a rectangle instead
-        // // of a quadrilateral, but my intention was to test all of the points.
-        // vertex(
-        //     this.LEFT_MARGIN - this.BOUNDING_BOX_PADDINGH,
-        //     BOX_TOP_Y
-        // )
-        // vertex(
-        //     this.LEFT_MARGIN - this.BOUNDING_BOX_PADDINGH,
-        //     BOX_BOTTOM_Y
-        // )
-        // vertex(
-        //     width - this.RIGHT_MARGIN + this.BOUNDING_BOX_PADDINGH,
-        //     BOX_BOTTOM_Y
-        // )
-        // vertex(
-        //     width - this.RIGHT_MARGIN + this.BOUNDING_BOX_PADDINGH,
-        //     BOX_TOP_Y
-        // )
-        // endContour()
-        //
-        // endShape(CLOSE)
-        //
-        // // print(BOX_BOTTOM_Y)
+        // the inner shape is the bounding box, with all of the coordinates
+        // from my old quadrilateral. I should have used a rectangle instead
+        // of a quadrilateral, but my intention was to test all of the points.
+        vertex(
+            this.LEFT_MARGIN - this.BOUNDING_BOX_PADDINGH,
+            BOX_TOP_Y
+        )
+        vertex(
+            this.LEFT_MARGIN - this.BOUNDING_BOX_PADDINGH,
+            BOX_BOTTOM_Y
+        )
+        vertex(
+            width - this.RIGHT_MARGIN + this.BOUNDING_BOX_PADDINGH,
+            BOX_BOTTOM_Y
+        )
+        vertex(
+            width - this.RIGHT_MARGIN + this.BOUNDING_BOX_PADDINGH,
+            BOX_TOP_Y
+        )
+        endContour()
+
+        endShape(CLOSE)
+
+        // print(BOX_BOTTOM_Y)
     }
 
 

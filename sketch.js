@@ -9,13 +9,19 @@ let instructions
 let debugCorner /* output debug text in the bottom left corner of the canvas */
 let championData // data from the riot API
 let baseChampionString = "https://ddragon.leagueoflegends.com/cdn/12.12.1/data/en_US/champion/"
-let champion = "Aatrox" // the champion we want to search for in the riot API
+let champion = "Braum" // the champion we want to search for in the riot API
 let passage
+let baseImageString = "https://ddragon.leagueoflegends.com/cdn/12.12.1/img/champion/"
 const CARD_IMG_WIDTH = 340
 const CARD_HORIZONTAL_MARGIN = 50
+let championImage
+let correct, incorrect
+
 
 function preload() {
     font = loadFont('data/consola.ttf')
+    correct = loadSound("data/correct.wav")
+    incorrect = loadSound("data/incorrect.wav")
 }
 
 
@@ -34,10 +40,8 @@ function setup() {
 
     // ask the Riot API for data on champions with a callback
     loadJSON("https://ddragon.leagueoflegends.com/cdn/12.12.1/data/en_US/champion.json", gotData)
-
-    // initialize the passage with a name
-    passage = new Passage("ABCDEFGHIJKLMNOPQRSTUVQXYZ")
 }
+
 
 function gotData(data) {
     championData = data
@@ -74,6 +78,14 @@ function gotChampionData(data) {
         currentChampionSpellbook[ability["id"]] = ability["name"]
     }
     console.log(currentChampionSpellbook)
+
+    passage = new Passage(currentChampionData["lore"])
+
+    // passage.render()
+
+    championImage = loadImage(baseImageString + currentChampionData["image"]["full"])
+
+    // noLoop()
 }
 
 function draw() {
@@ -83,7 +95,11 @@ function draw() {
     //     noLoop()
 
     rectMode(CORNER)
-    passage.render()
+    if (passage)
+        passage.render()
+
+    if (championImage)
+        image(championImage, 1040, 200)
 
     showDebugCorner()
 }
@@ -168,11 +184,11 @@ function keyPressed() {
     }
 
     if (key === passage.getCurrentChar()) {
-        // correct.play()
+        correct.play()
         passage.setCorrect()
     }
     else {
-        // incorrect.play()
+        incorrect.play()
         passage.setIncorrect()
     }
 }
