@@ -9,14 +9,18 @@ let instructions
 let debugCorner /* output debug text in the bottom left corner of the canvas */
 let championData // data from the riot API
 let baseChampionString = "https://ddragon.leagueoflegends.com/cdn/12.12.1/data/en_US/champion/"
-let champion = "Braum" // the champion we want to search for in the riot API
+let champion = "Darius" // the champion we want to search for in the riot API
 let passage
 let baseImageString = "https://ddragon.leagueoflegends.com/cdn/12.12.1/img/champion/"
-const CARD_IMG_WIDTH = 340
-const CARD_HORIZONTAL_MARGIN = 50
+const CHAMPION_IMG_WIDTH = 140
+const CHAMPION_HORIZONTAL_MARGIN = 150
 let championImage
 let correct, incorrect
-
+let baseSpellString = "https://ddragon.leagueoflegends.com/cdn/12.12.1/img/spell/"
+let currentChampionAbilityImages = []
+let abilityImgWidth = 50
+let abilityImgMargin = 10
+let abilityImgYPos = 0
 
 function preload() {
     font = loadFont('data/consola.ttf')
@@ -55,13 +59,8 @@ function gotData(data) {
 
     // query JSON using basic character
     loadJSON(baseChampionString + selectedChampionName + ".json", gotChampionData)
-
-    // currently commented out for testing above
-    // // loop through the data segment of championData, and print champion names
-    // for (let champion in championData["data"]) {
-    //     console.log(champion)
-    // }
 }
+
 
 function gotChampionData(data) {
     // the data from the current champion
@@ -85,8 +84,18 @@ function gotChampionData(data) {
 
     championImage = loadImage(baseImageString + currentChampionData["image"]["full"])
 
-    // noLoop()
+    // there are also champion images for abilities. I need to load and display
+    // them, which will also become typing later on.
+    for (let abilityImage of currentChampionData["spells"]) {
+
+        let currentSpellImage = loadImage(baseSpellString + abilityImage["image"]["full"])
+
+        currentChampionAbilityImages.push(currentSpellImage)
+
+        // image(currentSpellImage, random(width), random(height))
+    }
 }
+
 
 function draw() {
     background(234, 34, 24)
@@ -98,8 +107,27 @@ function draw() {
     if (passage)
         passage.render()
 
-    if (championImage)
-        image(championImage, 1040, 200)
+    if (championImage) {
+        const IMAGE_START_POS = new p5.Vector(
+            passage.LINE_WRAP_X_POS + CHAMPION_HORIZONTAL_MARGIN,
+            passage.TEXT_START.y
+        )
+
+        championImage.resize(CHAMPION_IMG_WIDTH, 0)
+
+        image(championImage, IMAGE_START_POS.x, IMAGE_START_POS.y)
+    }
+
+    if (currentChampionAbilityImages) {
+        for (let abilityImageIndex in currentChampionAbilityImages) {
+            let abilityImage = currentChampionAbilityImages[abilityImageIndex]
+            let abilityImgStartXPos = (abilityImageIndex) * (abilityImgWidth + abilityImgMargin)
+
+            abilityImage.resize(abilityImgWidth, 0)
+
+            image(abilityImage, abilityImgStartXPos, abilityImgYPos)
+        }
+    }
 
     showDebugCorner()
 }

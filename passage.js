@@ -25,7 +25,7 @@ class Passage {
 
         // the margin from the right edge of the bounding box to the right
         // canvas edge
-        this.RIGHT_MARGIN = CARD_IMG_WIDTH + 2 * CARD_HORIZONTAL_MARGIN
+        this.RIGHT_MARGIN = CHAMPION_IMG_WIDTH + 2 * CHAMPION_HORIZONTAL_MARGIN
 
         // padding for the highlight box of each character
         this.highlightBoxPadding = 3
@@ -35,7 +35,7 @@ class Passage {
         this.DIST_FROM_CANVAS_TOP = this.TOP_MARGIN - textAscent() - this.TOP_MARGIN
 
         // the x-position where I wrap my text.
-        this.LINE_WRAP_X_POS = width - CARD_IMG_WIDTH - 2 * CARD_HORIZONTAL_MARGIN
+        this.LINE_WRAP_X_POS = width - CHAMPION_IMG_WIDTH - 2 * CHAMPION_HORIZONTAL_MARGIN
 
         // this is where the text starts. Ideally I'd like 50 pixels of space.
         this.TEXT_START = new p5.Vector(
