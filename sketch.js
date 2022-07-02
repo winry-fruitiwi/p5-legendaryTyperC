@@ -21,6 +21,9 @@ let currentChampionAbilityImages = []
 let abilityImgWidth = 50
 let abilityImgMargin = 10
 let abilityImgYPos = 0
+let item = "Luden's Tempest"
+
+let itemData
 
 function preload() {
     font = loadFont('data/consola.ttf')
@@ -43,7 +46,24 @@ function setup() {
     debugCorner = new CanvasDebugCorner(5)
 
     // ask the Riot API for data on champions with a callback
-    loadJSON("https://ddragon.leagueoflegends.com/cdn/12.12.1/data/en_US/champion.json", gotData)
+    // loadJSON("https://ddragon.leagueoflegends.com/cdn/12.12.1/data/en_US/champion.json", gotData)
+    loadJSON("https://ddragon.leagueoflegends.com/cdn/12.12.1/data/en_US/item.json", gotItemJSON)
+}
+
+
+function gotItemJSON(data) {
+    itemData = data
+
+    print(data["data"])
+
+    for (let itemIndex in data["data"]) {
+        let currentItem = data["data"][itemIndex]
+        print(currentItem["name"] + "\n" + currentItem["plaintext"])
+
+        if (currentItem["name"] === item) {
+            passage = new Passage(currentItem["plaintext"])
+        }
+    }
 }
 
 
@@ -100,8 +120,8 @@ function gotChampionData(data) {
 function draw() {
     background(234, 34, 24)
 
-    // if (frameCount > 3000)
-    //     noLoop()
+    if (frameCount > 3000)
+        noLoop()
 
     rectMode(CORNER)
     if (passage)
@@ -262,4 +282,10 @@ class CanvasDebugCorner {
             text(msg, LEFT_MARGIN, DEBUG_Y_OFFSET - LINE_HEIGHT * index)
         }
     }
+}
+
+// prevents the context menu from showing up, even when the document
+// context menu key is pressed (which I use for scrolling the card list).
+document.oncontextmenu = function() {
+    return false;
 }
