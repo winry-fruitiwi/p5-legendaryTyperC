@@ -2,6 +2,17 @@
  *  @author
  *  @date 2022.06.27
  *
+ *  1. Find a way to just look at the first ability of a single champion.
+ *  2. Create a list of abilities, and scroll through those.
+ *  3. Find a way to access the champion's passive ability.
+ *  4. Create a list of abilities and the passive.
+ *  5. Use local storage to keep positions of where you are in the passage?
+ *  6. Scroll through champions and their first abilities.
+ *  7. Scroll through champions and abilities.
+ *  8. Scroll through champions and abilities and passives.
+ *
+ *  Can be broken up into sub-bites.
+ *
  */
 
 let font
@@ -47,7 +58,7 @@ function setup() {
     /* initialize instruction div */
     instructions = select('#ins')
     instructions.html(`<pre>
-        numpad 1 → freeze sketch</pre>`)
+        escape → freeze sketch</pre>`)
 
     debugCorner = new CanvasDebugCorner(5)
 
@@ -82,7 +93,6 @@ function gotItemJSON(data) {
 
 function gotData(data) {
     championData = data
-    let selectedChampionData = championData["data"][champion]
 
     for (let currentChampionIndex in championData["data"]) {
         let currentChampion = championData["data"][currentChampionIndex]
@@ -113,14 +123,14 @@ function gotChampionData(data) {
     // use a "dictionary" (or object) to keep track of current champion's
     // abilities. Objects serve a similar purpose in Javascript as
     // dictionaries in Python, which I am far more familiar with.
-    let currentChampionSpellbook = {}
+    let currentChampionSpellbook = []
 
     for (let ability of currentChampionData["spells"]) {
-        currentChampionSpellbook[ability["id"]] = ability["name"]
+        currentChampionSpellbook.push(ability["description"])
     }
     console.log(currentChampionSpellbook)
 
-    passage = new Passage(currentChampionData["lore"])
+    passage = new Passage(currentChampionSpellbook[0])
 
     // passage.render()
 
@@ -207,7 +217,12 @@ function keyPressed() {
     if (keyCode === 100 || keyCode === LEFT_ARROW) { /* numpad 4/left arrow */
         championIndex -= 1
 
-        loadJSON("https://ddragon.leagueoflegends.com/cdn/12.12.1/data/en_US/champion.json", gotData)
+        try {
+            loadJSON("https://ddragon.leagueoflegends.com/cdn/12.12.1/data/en_US/champion.json", gotData)
+        } catch {
+            championIndex = championNameList.length - 1
+            loadJSON("https://ddragon.leagueoflegends.com/cdn/12.12.1/data/en_US/champion.json", gotData)
+        }
 
         return
     }
@@ -218,12 +233,19 @@ function keyPressed() {
         loadJSON("https://ddragon.leagueoflegends.com/cdn/12.12.1/data/en_US/champion.json", gotData)
 
         return
+
     }
 
     if (keyCode === 104 || keyCode === UP_ARROW) { /* numpad 8/up arrow */
         championIndex += 10
 
-        loadJSON("https://ddragon.leagueoflegends.com/cdn/12.12.1/data/en_US/champion.json", gotData)
+        try {
+            loadJSON("https://ddragon.leagueoflegends.com/cdn/12.12.1/data/en_US/champion.json", gotData)
+        } catch {
+            championIndex = 0
+            loadJSON("https://ddragon.leagueoflegends.com/cdn/12.12.1/data/en_US/champion.json", gotData)
+
+        }
 
         return
     }
@@ -231,7 +253,13 @@ function keyPressed() {
     if (keyCode === 98 || keyCode === DOWN_ARROW) { /* numpad 2/down arrow */
         championIndex -= 10
 
-        loadJSON("https://ddragon.leagueoflegends.com/cdn/12.12.1/data/en_US/champion.json", gotData)
+        try {
+            loadJSON("https://ddragon.leagueoflegends.com/cdn/12.12.1/data/en_US/champion.json", gotData)
+        } catch {
+            championIndex = championNameList
+            loadJSON("https://ddragon.leagueoflegends.com/cdn/12.12.1/data/en_US/champion.json", gotData)
+
+        }
 
         return
     }
@@ -239,7 +267,12 @@ function keyPressed() {
     if (keyCode === 102 || keyCode === RIGHT_ARROW) { /* numpad 6/right arrow */
         championIndex += 1
 
-        loadJSON("https://ddragon.leagueoflegends.com/cdn/12.12.1/data/en_US/champion.json", gotData)
+        try {
+            loadJSON("https://ddragon.leagueoflegends.com/cdn/12.12.1/data/en_US/champion.json", gotData)
+        } catch {
+            championIndex = 0
+            loadJSON("https://ddragon.leagueoflegends.com/cdn/12.12.1/data/en_US/champion.json", gotData)
+        }
 
         return
     }
