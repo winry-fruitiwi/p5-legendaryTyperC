@@ -9,21 +9,27 @@ let instructions
 let debugCorner /* output debug text in the bottom left corner of the canvas */
 let championData // data from the riot API
 let baseChampionString = "https://ddragon.leagueoflegends.com/cdn/12.12.1/data/en_US/champion/"
-let champion = "Darius" // the champion we want to search for in the riot API
+let champion = "Gwen" // the champion we want to search for in the riot API
 let passage
-let baseImageString = "https://ddragon.leagueoflegends.com/cdn/12.12.1/img/champion/"
+let baseChampionImageString = "https://ddragon.leagueoflegends.com/cdn/12.12.1/img/champion/"
 const CHAMPION_IMG_WIDTH = 140
 const CHAMPION_HORIZONTAL_MARGIN = 150
 let championImage
 let correct, incorrect
 let baseSpellString = "https://ddragon.leagueoflegends.com/cdn/12.12.1/img/spell/"
-let currentChampionAbilityImages = []
+let currentChampionAbilityImages
 let abilityImgWidth = 50
 let abilityImgMargin = 10
 let abilityImgYPos = 0
-let item = "Luden's Tempest"
+let item = "Liandry's Anguish"
+let baseItemImgString = "https://ddragon.leagueoflegends.com/cdn/12.12.1/img/item/"
+let itemImg
 
 let itemData
+let itemImgWidth = 90
+
+let championNameList = []
+let championIndex
 
 function preload() {
     font = loadFont('data/consola.ttf')
@@ -45,23 +51,30 @@ function setup() {
 
     debugCorner = new CanvasDebugCorner(5)
 
+    championIndex = int(random(160))
+
     // ask the Riot API for data on champions with a callback
-    // loadJSON("https://ddragon.leagueoflegends.com/cdn/12.12.1/data/en_US/champion.json", gotData)
-    loadJSON("https://ddragon.leagueoflegends.com/cdn/12.12.1/data/en_US/item.json", gotItemJSON)
+    loadJSON("https://ddragon.leagueoflegends.com/cdn/12.12.1/data/en_US/champion.json", gotData)
+    // loadJSON("https://ddragon.leagueoflegends.com/cdn/12.12.1/data/en_US/item.json", gotItemJSON)
 }
 
 
 function gotItemJSON(data) {
     itemData = data
 
-    print(data["data"])
+    for (let itemIndex in itemData["data"]) {
+        print(itemIndex)
 
-    for (let itemIndex in data["data"]) {
-        let currentItem = data["data"][itemIndex]
-        print(currentItem["name"] + "\n" + currentItem["plaintext"])
+        let currentItem = itemData["data"][itemIndex]
+        // print(currentItem["name"] + "\n" + currentItem["plaintext"])
 
         if (currentItem["name"] === item) {
             passage = new Passage(currentItem["plaintext"])
+
+            // the current image URL
+            let currentImageURL = baseItemImgString + itemIndex + ".png"
+
+            itemImg = loadImage(currentImageURL)
         }
     }
 }
@@ -71,18 +84,27 @@ function gotData(data) {
     championData = data
     let selectedChampionData = championData["data"][champion]
 
-    print(selectedChampionData)
+    for (let currentChampionIndex in championData["data"]) {
+        let currentChampion = championData["data"][currentChampionIndex]
+        let currentChampionName = currentChampion["id"]
 
-    let selectedChampionName = selectedChampionData["name"]
+        print(currentChampionName)
 
-    print(selectedChampionName)
+        championNameList.push(currentChampionName)
+    }
+
+    champion = championNameList[championIndex]
+
+    console.log(baseChampionString + championNameList[championIndex] + ".json")
 
     // query JSON using basic character
-    loadJSON(baseChampionString + selectedChampionName + ".json", gotChampionData)
+    loadJSON(baseChampionString + championNameList[championIndex] + ".json", gotChampionData)
 }
 
 
 function gotChampionData(data) {
+    currentChampionAbilityImages = []
+
     // the data from the current champion
     let currentChampionData = data["data"][champion]
 
@@ -102,7 +124,7 @@ function gotChampionData(data) {
 
     // passage.render()
 
-    championImage = loadImage(baseImageString + currentChampionData["image"]["full"])
+    championImage = loadImage(baseChampionImageString + currentChampionData["image"]["full"])
 
     // there are also champion images for abilities. I need to load and display
     // them, which will also become typing later on.
@@ -149,6 +171,17 @@ function draw() {
         }
     }
 
+    if (itemImg) {
+        const IMAGE_START_POS = new p5.Vector(
+            passage.LINE_WRAP_X_POS + CHAMPION_HORIZONTAL_MARGIN,
+            passage.TEXT_START.y
+        )
+
+        itemImg.resize(itemImgWidth, 0)
+
+        image(itemImg, IMAGE_START_POS.x, IMAGE_START_POS.y)
+    }
+
     showDebugCorner()
 }
 
@@ -171,52 +204,45 @@ function keyPressed() {
         return
     }
 
-    // if (keyCode === 100 || keyCode === LEFT_ARROW) { /* numpad 4/left arrow */
-    //     currentCardIndex--
-    //     currentCardIndex = constrain(
-    //         currentCardIndex, 0, scryfall["data"].length - 1
-    //     )
-    //
-    //     updateCard()
-    //     return
-    // }
-    //
-    // if (keyCode === 101 || keyCode === 93) { /* numpad 5 or context menu */
-    //     currentCardIndex = int(random(0, scryfall["data"].length - 1))
-    //
-    //     updateCard()
-    //     return
-    // }
-    //
-    // if (keyCode === 104 || keyCode === UP_ARROW) { /* numpad 8/up arrow */
-    //     currentCardIndex += 10
-    //     currentCardIndex = constrain(
-    //         currentCardIndex, 0, scryfall["data"].length - 1
-    //     )
-    //
-    //     updateCard()
-    //     return
-    // }
-    //
-    // if (keyCode === 98 || keyCode === DOWN_ARROW) { /* numpad 2/down arrow */
-    //     currentCardIndex -= 10
-    //     currentCardIndex = constrain(
-    //         currentCardIndex, 0, scryfall["data"].length - 1
-    //     )
-    //
-    //     updateCard()
-    //     return
-    // }
-    //
-    // if (keyCode === 102 || keyCode === RIGHT_ARROW) { /* numpad 6 */
-    //     currentCardIndex++
-    //     currentCardIndex = constrain(
-    //         currentCardIndex, 0, scryfall["data"].length - 1
-    //     )
-    //
-    //     updateCard()
-    //     return
-    // }
+    if (keyCode === 100 || keyCode === LEFT_ARROW) { /* numpad 4/left arrow */
+        championIndex -= 1
+
+        loadJSON("https://ddragon.leagueoflegends.com/cdn/12.12.1/data/en_US/champion.json", gotData)
+
+        return
+    }
+
+    if (keyCode === 101 || keyCode === 93) { /* numpad 5 or context menu */
+        championIndex = int(random(championNameList.length))
+
+        loadJSON("https://ddragon.leagueoflegends.com/cdn/12.12.1/data/en_US/champion.json", gotData)
+
+        return
+    }
+
+    if (keyCode === 104 || keyCode === UP_ARROW) { /* numpad 8/up arrow */
+        championIndex += 10
+
+        loadJSON("https://ddragon.leagueoflegends.com/cdn/12.12.1/data/en_US/champion.json", gotData)
+
+        return
+    }
+
+    if (keyCode === 98 || keyCode === DOWN_ARROW) { /* numpad 2/down arrow */
+        championIndex -= 10
+
+        loadJSON("https://ddragon.leagueoflegends.com/cdn/12.12.1/data/en_US/champion.json", gotData)
+
+        return
+    }
+
+    if (keyCode === 102 || keyCode === RIGHT_ARROW) { /* numpad 6/right arrow */
+        championIndex += 1
+
+        loadJSON("https://ddragon.leagueoflegends.com/cdn/12.12.1/data/en_US/champion.json", gotData)
+
+        return
+    }
 
     if (keyCode === SHIFT ||
         keyCode === ALT ||
